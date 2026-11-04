@@ -6,13 +6,15 @@ Add a **Login** screen to the app and show it whenever there is no auth token. O
 ## Structure
 ```
 app/src/
-├── main.jsx                  # routes: /login (public), / (protected)
+├── main.jsx                  # routes: /login (public), / (protected); pages lazy loaded
 ├── controllers/
 │   └── AuthCtrl.js           # AuthCtrl class with static token helpers (localStorage)
 ├── components/
-│   └── RequireAuth.jsx       # redirects to /login when there is no token
+│   ├── RequireAuth.jsx       # redirects to /login when there is no token
+│   └── PageLoader.jsx        # full-screen HeroUI Spinner shown while a page chunk loads
 └── pages/
-    └── Login.jsx             # login form
+    ├── Login.jsx             # login form
+    └── HelloWorld.jsx        # placeholder home page
 ```
 
 ## Token (`app/src/controllers/AuthCtrl.js`)
@@ -51,6 +53,9 @@ app/src/
 - `/login` → `Login`.
 - Layout route with `RequireAuth` → `/` (current `HelloWorld`).
 - Any unknown path → `<Navigate to="/" replace />` (the guard then sends it to `/login` when there is no token).
+- Every page under `pages/` is lazy loaded with `React.lazy(() => import(...))`, so each page is its own build chunk, downloaded the first time its route renders.
+- One `<Suspense fallback={<PageLoader />}>` wraps `<Routes>`. `RequireAuth` and `PageLoader` stay in the main bundle because every route needs them.
+- New pages follow the same pattern: a default-exported component in `pages/`, registered in `main.jsx` with `lazy`.
 
 ## Dependencies (allowed)
 - app: `@heroui/react` (v3) for the UI components, plus the peer dependencies it requires (`react-aria`, `react-aria-components`, `@react-aria/ssr`, `@react-aria/utils`, `@internationalized/date`).
@@ -69,6 +74,7 @@ app/src/
 5. With `localStorage.setItem('token', 'x')`, `/` shows the Hello World page and `/login` redirects to `/`.
 6. `npm run build` succeeds.
 7. With the system set to dark, the login renders in dark colors; with it set to light, it renders in light colors.
+8. `npm run build` outputs separate JS chunks for `Login` and `HelloWorld`, and the browser only downloads a page chunk when its route is opened.
 
 ## Out of scope — recommendations
 | Item | Recommendation |

@@ -35,3 +35,9 @@ See [spec.md](spec.md) and [plan.md](plan.md). Check each box when done.
 - [x] 7.3 Add the inline theme script to `app/index.html` (`.dark` / `.light` from the system preference)
 - [x] 7.4 Rebuild `Login.jsx` with HeroUI `Card`, `Form`, `TextField`, `Label`, `Input`, `FieldError` and `Button`
 - [x] 7.5 Verify validation, redirects, light and dark mode, and `npm run build`
+
+## 8. Lazy loading
+- [x] 8.1 Move `HelloWorld` into `app/src/pages/HelloWorld.jsx`
+- [x] 8.2 Create `app/src/components/PageLoader.jsx` (HeroUI `Spinner`)
+- [x] 8.3 Load `Login` and `HelloWorld` with `React.lazy` and wrap `Routes` in `Suspense`
+- [x] 8.4 Verify separate page chunks in the build and on-demand loading in the browser

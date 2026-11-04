@@ -15,6 +15,7 @@ Only the client changes. An `AuthCtrl` controller with static methods reads the 
 | UI components | HeroUI v3 (`Card`, `Form`, `TextField`, `Label`, `Input`, `FieldError`, `Button`) | Project UI library from AGENTS.md. v3 supports React 19 and Tailwind v4 |
 | Validation display | Own state drives `isInvalid` and the `FieldError` text; `Form validationBehavior="aria"` | Keeps custom messages and avoids browser validation popups |
 | Light/dark | Inline script in `index.html` toggles `.dark` / `.light` on `<html>` from `prefers-color-scheme` | HeroUI theme variables switch on the class, not the media query, and the script runs before paint so there is no flash |
+| Page loading | `React.lazy` + one `Suspense` around `Routes` with a HeroUI `Spinner` fallback | Smaller first load; each page is its own chunk. Built into React, no new dependency |
 
 ## Steps
 1. `app/src/controllers/AuthCtrl.js`: `AuthCtrl` class with `static getToken()`.
