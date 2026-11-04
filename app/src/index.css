@@ -1,1 +1,24 @@
 @import "tailwindcss";
+@import "@heroui/styles";
+
+/*
+ * Light/dark mode follows the system preference by default.
+ * HeroUI switches theme with the `.dark` class on <html>, which the inline
+ * script in index.html keeps in sync with `prefers-color-scheme`.
+ */
+/*
+ * HeroUI's input background matches the card surface by default, so inputs
+ * blend into cards. Give fields their own, slightly distinct tone.
+ */
+:root,
+.light {
+  --field-background: oklch(0.97 0.0013 286.37);
+}
+
+.dark {
+  --field-background: oklch(0.27 0.006 286.03);
+}
+
+body {
+  @apply bg-background text-foreground;
+}
