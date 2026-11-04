@@ -2,13 +2,14 @@ import { useState } from 'react';
 import { Navigate } from 'react-router';
 import {
   Button,
-  Card,
   FieldError,
   Form,
   Input,
   Label,
+  Link,
   TextField,
 } from '@heroui/react';
+import AuthLayout from '../components/AuthLayout.jsx';
 import AuthCtrl from '../controllers/AuthCtrl.js';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -74,42 +75,44 @@ export default function Login() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center px-4">
-      <Card className="w-full max-w-sm p-6 sm:p-8">
-        <Card.Header>
-          <Card.Title className="text-2xl font-bold">Sign in</Card.Title>
-        </Card.Header>
-
-        <Card.Content>
-          <Form
-            onSubmit={handleSubmit}
-            validationBehavior="aria"
-            className="flex flex-col gap-4"
+    <AuthLayout
+      title="Sign in"
+      footer={
+        <p>
+          Don&apos;t have an account?{' '}
+          <Link href="/register" className="font-medium">
+            Register
+          </Link>
+        </p>
+      }
+    >
+      <Form
+        onSubmit={handleSubmit}
+        validationBehavior="aria"
+        className="flex flex-col gap-4"
+      >
+        {FIELDS.map((field) => (
+          <TextField
+            key={field.name}
+            name={field.name}
+            type={field.type}
+            autoComplete={field.autoComplete}
+            value={values[field.name]}
+            onChange={(value) => handleChange(field.name, value)}
+            isRequired
+            isInvalid={Boolean(errors[field.name])}
+            fullWidth
           >
-            {FIELDS.map((field) => (
-              <TextField
-                key={field.name}
-                name={field.name}
-                type={field.type}
-                autoComplete={field.autoComplete}
-                value={values[field.name]}
-                onChange={(value) => handleChange(field.name, value)}
-                isRequired
-                isInvalid={Boolean(errors[field.name])}
-                fullWidth
-              >
-                <Label>{field.label}</Label>
-                <Input />
-                <FieldError>{errors[field.name]}</FieldError>
-              </TextField>
-            ))}
+            <Label>{field.label}</Label>
+            <Input />
+            <FieldError>{errors[field.name]}</FieldError>
+          </TextField>
+        ))}
 
-            <Button type="submit" fullWidth className="mt-2">
-              Sign in
-            </Button>
-          </Form>
-        </Card.Content>
-      </Card>
-    </main>
+        <Button type="submit" fullWidth className="mt-2">
+          Sign in
+        </Button>
+      </Form>
+    </AuthLayout>
   );
 }
