@@ -1,6 +1,7 @@
 import path from 'node:path';
 import express from 'express';
-import pool from './db.js';
+import pool from './src/controllers/db.js';
+import MigrationCtrl from './src/controllers/MigrationCtrl.js';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -25,6 +26,14 @@ app.get('/{*splat}', (req, res, next) => {
     if (err) next();
   });
 });
+
+// Run pending SQL migrations before accepting requests. The server still
+// starts if they fail (e.g. database down); /api/health reports the DB state.
+try {
+  await MigrationCtrl.init();
+} catch (error) {
+  console.error(error.message);
+}
 
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
