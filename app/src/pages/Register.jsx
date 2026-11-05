@@ -154,12 +154,10 @@ export default function Register() {
               </Alert.Description>
             </Alert.Content>
           </Alert>
-          <div className="flex flex-col gap-2">
-            <p className="text-center text-sm text-muted">
-              Didn&apos;t receive it? Check your spam folder or
-            </p>
-            <ResendVerification email={registeredUser.email} />
-          </div>
+          <ResendVerification
+            email={registeredUser.email}
+            hint="Didn't receive it? Check your spam folder, or send it again."
+          />
           <Link href="/login" className="self-center font-medium">
             Go to sign in
           </Link>

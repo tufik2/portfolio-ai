@@ -84,10 +84,11 @@ extend type Mutation {
 ### App
 - `app/src/controllers/UserCtrl.js`: `static async resendVerificationEmail(email)`.
 - `app/src/components/ResendVerification.jsx`:
+  - optional `hint` text above the button or form, hidden once the email is sent;
   - with an `email` prop: a single **Resend email** button (secondary style); after sending: "We sent a new verification link to <email>. Earlier links no longer work.";
   - without it: an Email field (required, format checked) and a **Send new link** button; after sending: "If that email is waiting for verification, we sent it a new link. Earlier links no longer work.";
   - pending state ("Sending…"), and a danger alert for network or server errors.
-- Used on the Register **Check your email** card ("Didn't receive it? Check your spam folder or" + button) and on the `/verify-email` **Verification failed** page (email form). The failed page covers users registered before verification existed and anyone whose link was already used or lost.
+- Used on the Register **Check your email** card (hint: "Didn't receive it? Check your spam folder, or send it again." + button) and on the `/verify-email` **Verification failed** page (email form). The failed page covers users registered before verification existed and anyone whose link was already used or lost.
 
 ## Dependencies (allowed)
 - None new. Uses Node's built-in `crypto`, plus `nodemailer` and `graphql` already allowed.

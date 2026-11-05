@@ -30,4 +30,4 @@ See [spec.md](spec.md) and [plan.md](plan.md). Check each box when done.
 - [x] 5.2 `UserCtrl.resendVerificationEmail()` in the app and `components/ResendVerification.jsx`
 - [x] 5.3 Resend button on the Register "Check your email" card
 - [x] 5.4 Resend form on the `/verify-email` failed page
-- [ ] 5.5 Verify: old link invalid after resend, new link works; same answer for unknown / active emails; cooldown; delete test users
+- [x] 5.5 Verify: old link invalid after resend, new link works; same answer for unknown / active emails; cooldown; delete test users

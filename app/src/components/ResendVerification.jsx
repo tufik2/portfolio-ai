@@ -16,8 +16,9 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
  * Resends the verification email.
  * - With `email`: shows a single "Resend email" button for that address.
  * - Without `email`: shows an email field and a "Send new link" button.
+ * `hint` is shown above the button/form and hidden once the email is sent.
  */
-export default function ResendVerification({ email: knownEmail }) {
+export default function ResendVerification({ email: knownEmail, hint }) {
   const [email, setEmail] = useState('');
   const [fieldError, setFieldError] = useState('');
   const [formError, setFormError] = useState('');
@@ -73,6 +74,8 @@ export default function ResendVerification({ email: knownEmail }) {
       validationBehavior="aria"
       className="flex flex-col gap-3"
     >
+      {hint && <p className="w-full text-sm text-muted">{hint}</p>}
+
       {!knownEmail && (
         <TextField
           name="email"

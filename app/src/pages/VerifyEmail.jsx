@@ -77,13 +77,7 @@ export default function VerifyEmail() {
             <Alert.Description>{error}</Alert.Description>
           </Alert.Content>
         </Alert>
-        <div className="flex flex-col gap-2">
-          <p className="text-sm text-muted">
-            Still need to verify your email? Enter it below and we&apos;ll send
-            you a new link.
-          </p>
-          <ResendVerification />
-        </div>
+        <ResendVerification hint="Still need to verify your email? Enter it below and we'll send you a new link." />
         <Link href="/login" className="self-center font-medium">
           Back to sign in
         </Link>
