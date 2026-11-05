@@ -1,0 +1,18 @@
+type LoginCodeRequest {
+  resendAvailableAt: DateTime!
+}
+
+type AuthPayload {
+  token: String!
+  refreshToken: String!
+  tokenExpiresAt: DateTime!
+  refreshTokenExpiresAt: DateTime!
+  user: User!
+}
+
+extend type Mutation {
+  requestLoginCode(email: EmailAddress!): LoginCodeRequest!
+  verifyLoginCode(email: EmailAddress!, code: String!): AuthPayload!
+  refreshToken(refreshToken: String!): AuthPayload!
+  logout: Boolean!
+}

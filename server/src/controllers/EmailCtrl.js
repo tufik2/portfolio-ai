@@ -86,4 +86,32 @@ export default class EmailCtrl {
       `,
     });
   }
+
+  /**
+   * Email with a 6-digit sign-in code.
+   * @param {{firstName: string, email: string}} user
+   * @param {string} code
+   * @param {number} expiresInMinutes
+   */
+  static sendLoginCode(user, code, expiresInMinutes) {
+    return EmailCtrl.send({
+      to: user.email,
+      subject: 'Your sign-in code',
+      text: [
+        `Hi ${user.firstName},`,
+        '',
+        `Your sign-in code is ${code}.`,
+        `It expires in ${expiresInMinutes} minutes.`,
+        '',
+        "If you didn't try to sign in, you can ignore this email.",
+      ].join('\n'),
+      html: `
+        <p>Hi ${escapeHtml(user.firstName)},</p>
+        <p>Your sign-in code is:</p>
+        <p style="font-size:32px;font-weight:700;letter-spacing:8px;margin:16px 0">${escapeHtml(code)}</p>
+        <p>It expires in ${Number(expiresInMinutes)} minutes.</p>
+        <p>If you didn't try to sign in, you can ignore this email.</p>
+      `,
+    });
+  }
 }

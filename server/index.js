@@ -2,6 +2,7 @@ import path from 'node:path';
 import express from 'express';
 import pool from './src/controllers/db.js';
 import MigrationCtrl from './src/controllers/MigrationCtrl.js';
+import AuthCtrl from './src/controllers/AuthCtrl.js';
 import { executeGraphql } from './src/graphql/index.js';
 
 const app = express();
@@ -28,11 +29,14 @@ app.post('/graphql', express.json(), async (req, res) => {
       errors: [{ message: 'Request body must include a "query" string.' }],
     });
   }
+  let auth;
   const result = await executeGraphql({
     query,
     variables,
     operationName,
-    context: { req },
+    // getAuth() resolves the Authorization header to { user, session } (or
+    // null) on first use only, so requests that don't need it skip the DB.
+    context: { req, getAuth: () => (auth ??= AuthCtrl.authenticate(req)) },
   });
   res.json(result);
 });

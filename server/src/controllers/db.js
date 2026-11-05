@@ -6,6 +6,8 @@ export const dbConfig = {
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
+  // All DATETIME columns hold UTC (UTC_TIMESTAMP()); read and write them as UTC.
+  timezone: 'Z',
 };
 
 const pool = mysql.createPool(dbConfig);

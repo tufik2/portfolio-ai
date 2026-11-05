@@ -4,3 +4,4 @@
 scalar UUID
 scalar EmailAddress
 scalar JSON
+scalar DateTime

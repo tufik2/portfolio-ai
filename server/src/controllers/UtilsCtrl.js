@@ -43,6 +43,37 @@ export default class UtilsCtrl {
   }
 
   /**
+   * New 6-digit sign-in code, zero-padded (e.g. "004821").
+   * @returns {string}
+   */
+  static newLoginCode() {
+    return String(crypto.randomInt(0, 1_000_000)).padStart(6, '0');
+  }
+
+  /**
+   * Hash stored for a sign-in code: SHA-256 of "<user uuid>:<code>", so the
+   * same code for two users gives different hashes.
+   * @param {string} userUuid
+   * @param {string} code
+   * @returns {string}
+   */
+  static hashLoginCode(userUuid, code) {
+    return UtilsCtrl.hashToken(`${userUuid}:${code}`);
+  }
+
+  /**
+   * Compares two hex hashes without leaking timing information.
+   * @param {string} a
+   * @param {string} b
+   * @returns {boolean}
+   */
+  static hashesEqual(a, b) {
+    const left = Buffer.from(String(a ?? ''));
+    const right = Buffer.from(String(b ?? ''));
+    return left.length === right.length && crypto.timingSafeEqual(left, right);
+  }
+
+  /**
    * Link to the app's /verify-email page for a token, based on APP_URL.
    * @param {string} token
    * @returns {string} e.g. http://localhost:5173/verify-email?token=…

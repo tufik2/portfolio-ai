@@ -11,7 +11,8 @@ import './index.css';
 const Login = lazy(() => import('./pages/Login.jsx'));
 const Register = lazy(() => import('./pages/Register.jsx'));
 const VerifyEmail = lazy(() => import('./pages/VerifyEmail.jsx'));
-const HelloWorld = lazy(() => import('./pages/HelloWorld.jsx'));
+const AppLayout = lazy(() => import('./components/AppLayout.jsx'));
+const Home = lazy(() => import('./pages/Home.jsx'));
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -23,7 +24,9 @@ createRoot(document.getElementById('root')).render(
             <Route path="/register" element={<Register />} />
             <Route path="/verify-email" element={<VerifyEmail />} />
             <Route element={<RequireAuth />}>
-              <Route path="/" element={<HelloWorld />} />
+              <Route element={<AppLayout />}>
+                <Route path="/" element={<Home />} />
+              </Route>
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
