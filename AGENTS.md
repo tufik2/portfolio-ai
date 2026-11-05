@@ -32,6 +32,7 @@ Application to manage organizations, properties, tasks and users.
 
 ### Server
 - Controllers are classes with static methods in `server/src/controllers/<Name>Ctrl.js` (e.g. `UserCtrl`, `EmailCtrl`, `MigrationCtrl`). Database access, email, and business logic live there.
+- Entities are data classes in `server/src/entity/<Entity>.js`, one per table (e.g. `User`): camelCase properties, status constants (`User.STATUS.ACTIVE`), the column list to select (`User.COLUMNS`, never secret columns such as hashes) and `fromRow()` to map a snake_case row. They contain no SQL; controllers keep the queries and return entity instances.
 - All email code lives in `server/src/controllers/EmailCtrl.js`.
 - Shared helpers live in `server/src/controllers/UtilsCtrl.js` as static methods: validation (`isEmail()`, `isUUID()`) and tokens / links (`hashToken()`, `newVerificationToken()`, `verifyEmailUrl()`). Don't redefine them as local functions in other controllers.
 - GraphQL:

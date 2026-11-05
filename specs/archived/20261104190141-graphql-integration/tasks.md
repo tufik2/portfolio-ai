@@ -46,7 +46,7 @@ See [spec.md](spec.md) and [plan.md](plan.md). Check each box when done.
 - [x] 8.3 Create `server/src/controllers/EmailCtrl.js` (`verify`, `send`, `sendRegistration`)
 - [x] 8.4 Send the registration email from `UserCtrl.register()` in the background
 - [x] 8.5 Verify the SMTP login, and that registration succeeds and logs the error when the email can't be sent
-- [ ] 8.6 Set `EMAIL_FROM` to an SES-verified sender and confirm a real registration email arrives
+- [x] 8.6 Set `EMAIL_FROM` to an SES-verified sender and confirm a real registration email arrives
 
 ## 9. Single-argument GraphqlCtrl.request
 - [x] 9.1 `GraphqlCtrl.request(query)`: no `variables` argument; sends `{ query }`
