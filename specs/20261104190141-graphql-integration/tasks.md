@@ -1,0 +1,35 @@
+# Tasks: GraphQL integration
+
+See [spec.md](spec.md) and [plan.md](plan.md). Check each box when done.
+
+## 1. Setup
+- [x] 1.1 Install `graphql` in `server/`
+
+## 2. User
+- [x] 2.1 Create `server/src/graphql/schema/User.graphql` (`UserStatus`, `User`, `RegisterUserInput`, `registerUser`)
+- [x] 2.2 Create `server/src/controllers/UserCtrl.js` with `static register()` (validation, insert, duplicate email)
+- [x] 2.3 Create `server/src/graphql/resolver/UserRes.js` with `registerUser`
+
+## 3. GraphQL loader and endpoint
+- [x] 3.1 Create `server/src/graphql/index.js` (load schema files, merge resolvers, `executeGraphql()`)
+- [x] 3.2 Mount `POST /graphql` in `server/index.js`
+
+## 4. Verify
+- [x] 4.1 `registerUser` returns the new user and inserts the row
+- [x] 4.2 Duplicate email → `EMAIL_TAKEN`, nothing inserted
+- [x] 4.3 Invalid input → `BAD_USER_INPUT`, nothing inserted
+- [x] 4.4 Missing `query` → HTTP 400
+- [x] 4.5 `/api/health` still works
+- [x] 4.6 Delete test users
+
+## 5. Register screen
+- [x] 5.1 Create `app/src/controllers/GraphqlCtrl.js` (`fetch` to `/graphql`, `GraphqlError` with `code` / `field`)
+- [x] 5.2 Create `app/src/controllers/UserCtrl.js` with `static register()` (`registerUser` mutation)
+- [x] 5.3 Call it from `Register.jsx`: pending button, success card, field and form errors
+- [x] 5.4 Verify in the browser: success, duplicate email, server down; delete test users
+
+## 6. Client-generated UUID
+- [x] 6.1 Add `uuid: ID!` to `RegisterUserInput`
+- [x] 6.2 Server `UserCtrl.register()`: validate the UUID format, insert it, map a duplicate UUID to `UUID_TAKEN`
+- [x] 6.3 App `UserCtrl.register()`: generate the UUID with `crypto.randomUUID()`
+- [x] 6.4 Verify: client UUID is stored, bad / duplicate UUID rejected, Register screen still works; delete test users

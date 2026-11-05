@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Navigate } from 'react-router';
 import {
+  Alert,
   Button,
   FieldError,
   Form,
@@ -11,6 +12,7 @@ import {
 } from '@heroui/react';
 import AuthLayout from '../components/AuthLayout.jsx';
 import AuthCtrl from '../controllers/AuthCtrl.js';
+import UserCtrl from '../controllers/UserCtrl.js';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -36,6 +38,8 @@ const EMAIL_FIELD = {
   autoComplete: 'email',
 };
 
+const FIELD_NAMES = ['firstName', 'lastName', 'email'];
+
 function validate(values) {
   const errors = {};
   if (!values.firstName.trim()) {
@@ -59,6 +63,9 @@ export default function Register() {
     email: '',
   });
   const [errors, setErrors] = useState({});
+  const [formError, setFormError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [registeredUser, setRegisteredUser] = useState(null);
 
   if (AuthCtrl.getToken()) {
     return <Navigate to="/" replace />;
@@ -69,15 +76,37 @@ export default function Register() {
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: undefined }));
     }
+    if (formError) setFormError('');
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
+    if (isSubmitting) return;
+
     const nextErrors = validate(values);
     setErrors(nextErrors);
+    setFormError('');
     if (Object.keys(nextErrors).length > 0) return;
 
-    // TODO: call register API
+    setIsSubmitting(true);
+    try {
+      const user = await UserCtrl.register({
+        firstName: values.firstName.trim(),
+        lastName: values.lastName.trim(),
+        email: values.email.trim(),
+      });
+      setRegisteredUser(user);
+    } catch (error) {
+      // Server errors tied to a field (e.g. EMAIL_TAKEN) show under that
+      // field; anything else shows above the button.
+      if (FIELD_NAMES.includes(error.field)) {
+        setErrors((prev) => ({ ...prev, [error.field]: error.message }));
+      } else {
+        setFormError(error.message || 'Could not register. Try again.');
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   function renderField(field) {
@@ -91,6 +120,7 @@ export default function Register() {
         onChange={(value) => handleChange(field.name, value)}
         isRequired
         isInvalid={Boolean(errors[field.name])}
+        isDisabled={isSubmitting}
         fullWidth
       >
         <Label>{field.label}</Label>
@@ -100,18 +130,38 @@ export default function Register() {
     );
   }
 
-  return (
-    <AuthLayout
-      title="Create account"
-      footer={
-        <p>
-          Already have an account?{' '}
-          <Link href="/login" className="font-medium">
-            Sign in
+  const signInFooter = (
+    <p>
+      Already have an account?{' '}
+      <Link href="/login" className="font-medium">
+        Sign in
+      </Link>
+    </p>
+  );
+
+  if (registeredUser) {
+    return (
+      <AuthLayout title="Account created">
+        <div className="flex flex-col gap-4">
+          <Alert status="success">
+            <Alert.Indicator />
+            <Alert.Content>
+              <Alert.Title>Welcome, {registeredUser.firstName}!</Alert.Title>
+              <Alert.Description>
+                Your account for {registeredUser.email} has been created.
+              </Alert.Description>
+            </Alert.Content>
+          </Alert>
+          <Link href="/login" className="self-center font-medium">
+            Go to sign in
           </Link>
-        </p>
-      }
-    >
+        </div>
+      </AuthLayout>
+    );
+  }
+
+  return (
+    <AuthLayout title="Create account" footer={signInFooter}>
       <Form
         onSubmit={handleSubmit}
         validationBehavior="aria"
@@ -122,8 +172,22 @@ export default function Register() {
         </div>
         {renderField(EMAIL_FIELD)}
 
-        <Button type="submit" fullWidth className="mt-2">
-          Create account
+        {formError && (
+          <Alert status="danger" className="w-full">
+            <Alert.Indicator />
+            <Alert.Content>
+              <Alert.Description>{formError}</Alert.Description>
+            </Alert.Content>
+          </Alert>
+        )}
+
+        <Button
+          type="submit"
+          fullWidth
+          className="mt-2"
+          isPending={isSubmitting}
+        >
+          {isSubmitting ? 'Creating account…' : 'Create account'}
         </Button>
       </Form>
     </AuthLayout>

@@ -2,6 +2,7 @@ import path from 'node:path';
 import express from 'express';
 import pool from './src/controllers/db.js';
 import MigrationCtrl from './src/controllers/MigrationCtrl.js';
+import { executeGraphql } from './src/graphql/index.js';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -17,6 +18,23 @@ app.get('/api/health', async (req, res) => {
   } catch {
     res.status(503).json({ status: 'error', env, db: 'error' });
   }
+});
+
+// GraphQL endpoint: body { query, variables?, operationName? }.
+app.post('/graphql', express.json(), async (req, res) => {
+  const { query, variables, operationName } = req.body ?? {};
+  if (typeof query !== 'string' || !query.trim()) {
+    return res.status(400).json({
+      errors: [{ message: 'Request body must include a "query" string.' }],
+    });
+  }
+  const result = await executeGraphql({
+    query,
+    variables,
+    operationName,
+    context: { req },
+  });
+  res.json(result);
 });
 
 // SPA fallback: let React Router handle any non-API route.
