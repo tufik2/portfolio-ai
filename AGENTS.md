@@ -26,6 +26,7 @@ Application to manage organizations, properties, tasks and users.
 
 ### Specs
 - Work is driven by specs in `specs/<YYYYMMDDHHMMSS>-<name>/` (`spec.md`, `plan.md`, `tasks.md`). Create them with `/new-spec`; archive finished ones with `/archive-spec` (moves them to `specs/archived/`).
+- **Don't implement anything until the spec is accepted.** Write `spec.md`, `plan.md` and `tasks.md` first, present them, and wait for explicit approval of all three before changing any code, database or configuration. If something changes during implementation, update the three files and get approval again before continuing.
 - Keep the spec, plan and tasks in sync with what is actually built; check off tasks when done.
 - Never edit archived specs.
 - When something is out of scope, recommend how to do it (and which dependency, if any) in the spec's "Out of scope — recommendations" table.
