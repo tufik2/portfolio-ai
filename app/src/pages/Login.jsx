@@ -15,12 +15,6 @@ import AuthCtrl from '../controllers/AuthCtrl.js';
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const FIELDS = [
-  {
-    name: 'communityCode',
-    label: 'Community code',
-    type: 'text',
-    autoComplete: 'organization',
-  },
   { name: 'email', label: 'Email', type: 'email', autoComplete: 'email' },
   {
     name: 'password',
@@ -32,9 +26,6 @@ const FIELDS = [
 
 function validate(values) {
   const errors = {};
-  if (!values.communityCode.trim()) {
-    errors.communityCode = 'Community code is required.';
-  }
   if (!values.email.trim()) {
     errors.email = 'Email is required.';
   } else if (!EMAIL_PATTERN.test(values.email.trim())) {
@@ -48,7 +39,6 @@ function validate(values) {
 
 export default function Login() {
   const [values, setValues] = useState({
-    communityCode: '',
     email: '',
     password: '',
   });
