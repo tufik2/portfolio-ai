@@ -10,6 +10,7 @@ import './index.css';
 // downloaded the first time its route renders.
 const Login = lazy(() => import('./pages/Login.jsx'));
 const Register = lazy(() => import('./pages/Register.jsx'));
+const VerifyEmail = lazy(() => import('./pages/VerifyEmail.jsx'));
 const HelloWorld = lazy(() => import('./pages/HelloWorld.jsx'));
 
 createRoot(document.getElementById('root')).render(
@@ -20,6 +21,7 @@ createRoot(document.getElementById('root')).render(
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/verify-email" element={<VerifyEmail />} />
             <Route element={<RequireAuth />}>
               <Route path="/" element={<HelloWorld />} />
             </Route>

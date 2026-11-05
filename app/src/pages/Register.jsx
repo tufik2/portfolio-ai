@@ -11,6 +11,7 @@ import {
   TextField,
 } from '@heroui/react';
 import AuthLayout from '../components/AuthLayout.jsx';
+import ResendVerification from '../components/ResendVerification.jsx';
 import AuthCtrl from '../controllers/AuthCtrl.js';
 import UserCtrl from '../controllers/UserCtrl.js';
 
@@ -141,17 +142,24 @@ export default function Register() {
 
   if (registeredUser) {
     return (
-      <AuthLayout title="Account created">
+      <AuthLayout title="Check your email">
         <div className="flex flex-col gap-4">
           <Alert status="success">
             <Alert.Indicator />
             <Alert.Content>
               <Alert.Title>Welcome, {registeredUser.firstName}!</Alert.Title>
               <Alert.Description>
-                Your account for {registeredUser.email} has been created.
+                We sent an email to <strong>{registeredUser.email}</strong>.
+                Follow the instructions in it to complete your registration.
               </Alert.Description>
             </Alert.Content>
           </Alert>
+          <div className="flex flex-col gap-2">
+            <p className="text-center text-sm text-muted">
+              Didn&apos;t receive it? Check your spam folder or
+            </p>
+            <ResendVerification email={registeredUser.email} />
+          </div>
           <Link href="/login" className="self-center font-medium">
             Go to sign in
           </Link>

@@ -45,6 +45,7 @@ type Mutation { _empty: Boolean }
 enum UserStatus {
   ACTIVE
   INACTIVE
+  EMAIL_VERIFICATION
 }
 
 type User {
@@ -72,6 +73,20 @@ extend type Mutation {
 - The `uuid` is **generated on the front-end** and sent in `RegisterUserInput`. The table's `DEFAULT (UUID())` stays as a fallback for rows inserted outside the API.
 - Fields are camelCase in GraphQL and snake_case in MySQL; the controller maps them.
 
+## User status (`server/migration/2026_11_04_0002_add_email_verification_status_to_user.sql`)
+- Adds `EMAIL_VERIFICATION` to `user.status` (`ENUM('ACTIVE', 'INACTIVE', 'EMAIL_VERIFICATION')`) and makes it the column default, so new registrations start unverified.
+- Existing rows keep their current status.
+- The GraphQL `UserStatus` enum has the same three values. It must always list every value the column can hold, or returning such a user fails.
+- Moving a user from `EMAIL_VERIFICATION` to `ACTIVE` (a verification link and an endpoint that confirms it) is a later spec.
+
+## Email (`server/src/controllers/EmailCtrl.js`)
+- All email code lives in `EmailCtrl` (static methods), using `nodemailer` over SMTP (Amazon SES).
+- Settings from `server/.env`: `EMAIL_HOST`, `EMAIL_PORT` (number), `EMAIL_SECURE` (`true` → TLS on connect), `EMAIL_USER`, `EMAIL_PASSWORD`, and `EMAIL_FROM`, the sender, which must be an address or domain verified in SES. `server/.env.example` lists the same keys with no values.
+- `EmailCtrl.verify()`: checks the SMTP connection and login without sending.
+- `EmailCtrl.send({ to, subject, text, html, from })`: sends one email; `from` defaults to `EMAIL_FROM` and throws if it is not set.
+- `EmailCtrl.sendRegistration(user)`: "Your account has been created" email (plain text + HTML, user text HTML-escaped), saying the email address will need to be verified.
+- `UserCtrl.register()` sends the registration email **in the background** after the user is created. A failed email is logged (`Registration email to <email> failed: …`) and never fails the registration.
+
 ## Resolver (`server/src/graphql/resolver/UserRes.js`)
 - Default export: an object of root resolvers, `{ registerUser }`.
 - `registerUser({ input }, context)` calls `UserCtrl.register(input)` and returns the created user.
@@ -80,7 +95,7 @@ extend type Mutation {
 - `UserCtrl` class with `static async register({ uuid, firstName, lastName, email })`:
   1. Trims all values and lowercases the email and the UUID.
   2. Validates: `uuid` must be a canonical UUID (`xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`, hex); names and email required; email format; first/last name ≤ 100 characters; email ≤ 255.
-  3. Inserts into `user` (`uuid`, `first_name`, `last_name`, `email`); `status` uses its table default.
+  3. Inserts into `user` (`uuid`, `first_name`, `last_name`, `email`); `status` uses its table default, `EMAIL_VERIFICATION` (see "User status" below).
   4. Reads the row back by `id` and returns `{ uuid, firstName, lastName, email, status }`.
 - Errors returned to the client (as GraphQL errors, with `extensions.code`):
   - invalid input → `BAD_USER_INPUT`, message naming the field;
@@ -95,26 +110,28 @@ extend type Mutation {
 - `app/src/pages/Register.jsx`:
   - after client validation passes, calls `UserCtrl.register()` with trimmed values;
   - while waiting: the button shows a spinner and "Creating account…", fields are disabled, double submits are ignored;
-  - success: the card switches to **Account created** with a success alert ("Welcome, <first name>!", "Your account for <email> has been created.") and a **Go to sign in** link;
+  - success: the card switches to **Check your email** with a success alert ("Welcome, <first name>!", "We sent an email to <email>. Follow the instructions in it to complete your registration.") and a **Go to sign in** link;
   - server error with a `field` (e.g. `EMAIL_TAKEN` → email, `BAD_USER_INPUT` → that field): shown under that field;
   - any other error (network, `INTERNAL_SERVER_ERROR`): a danger alert above the button. Editing any field clears it.
 
 ## Dependencies (allowed)
-- server: `graphql`.
+- server: `graphql`, `nodemailer` (SMTP email, used by `EmailCtrl`).
 - app: none new (uses `fetch`).
 - No other new dependencies.
 
 ## Acceptance criteria
-1. `POST /graphql` with `mutation { registerUser(input: {uuid: "<client uuid>", firstName: "Ana", lastName: "Diaz", email: "ana@example.com"}) { uuid firstName lastName email status } }` returns the new user with that same UUID and `status: ACTIVE`, and the row exists in `user`.
+1. `POST /graphql` with `mutation { registerUser(input: {uuid: "<client uuid>", firstName: "Ana", lastName: "Diaz", email: "ana@example.com"}) { uuid firstName lastName email status } }` returns the new user with that same UUID and `status: EMAIL_VERIFICATION`, and the row exists in `user`.
 2a. A missing or malformed `uuid` returns `BAD_USER_INPUT` (field `uuid`); reusing a UUID returns `UUID_TAKEN`. Neither inserts anything.
 2. Registering the same email again returns an `EMAIL_TAKEN` error and inserts nothing.
 3. Missing or invalid fields return `BAD_USER_INPUT` and insert nothing.
 4. Adding a new `schema/X.graphql` + `resolver/XRes.js` pair needs no changes to `index.js` files.
 5. A request without `query` returns HTTP 400.
 6. The server still starts and `/api/health` still works.
-7. Submitting the Register screen with valid data creates the user and shows the **Account created** card.
+7. Submitting the Register screen with valid data creates the user and shows the **Check your email** card.
 8. Registering an email that already exists shows "Email is already registered." under the Email field.
 9. With the server down, the Register screen shows a danger alert instead of failing silently.
+10. After `registerUser`, the user receives the registration email (with `EMAIL_FROM` set to an SES-verified sender).
+11. With email misconfigured or SES down, `registerUser` still succeeds and the server logs the email error.
 
 ## Out of scope — recommendations
 | Item | Recommendation |

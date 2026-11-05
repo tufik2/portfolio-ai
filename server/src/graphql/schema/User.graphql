@@ -1,6 +1,7 @@
 enum UserStatus {
   ACTIVE
   INACTIVE
+  EMAIL_VERIFICATION
 }
 
 type User {
@@ -21,4 +22,8 @@ input RegisterUserInput {
 
 extend type Mutation {
   registerUser(input: RegisterUserInput!): User!
+  "Consumes the one-time token from the registration email and activates the user."
+  verifyEmail(token: String!): User!
+  "Sends a new verification link if the email belongs to a user waiting for verification. Always returns true."
+  resendVerificationEmail(email: String!): Boolean!
 }

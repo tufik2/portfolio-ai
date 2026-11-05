@@ -33,3 +33,17 @@ See [spec.md](spec.md) and [plan.md](plan.md). Check each box when done.
 - [x] 6.2 Server `UserCtrl.register()`: validate the UUID format, insert it, map a duplicate UUID to `UUID_TAKEN`
 - [x] 6.3 App `UserCtrl.register()`: generate the UUID with `crypto.randomUUID()`
 - [x] 6.4 Verify: client UUID is stored, bad / duplicate UUID rejected, Register screen still works; delete test users
+
+## 7. EMAIL_VERIFICATION status
+- [x] 7.1 Create `server/migration/2026_11_04_0002_add_email_verification_status_to_user.sql` (new enum value, new default)
+- [x] 7.2 Test the SQL on a copy of `user`: existing rows keep their status, new rows default to `EMAIL_VERIFICATION`
+- [x] 7.3 Add `EMAIL_VERIFICATION` to the GraphQL `UserStatus` enum
+- [x] 7.4 Run the migration on startup and confirm `registerUser` returns `EMAIL_VERIFICATION`; delete test users
+
+## 8. Registration email
+- [x] 8.1 Add `nodemailer` to the spec's allowed dependencies and install it in `server/`
+- [x] 8.2 Add `EMAIL_*` variables to `server/.env` (values) and `server/.env.example` (no values), plus `EMAIL_FROM`
+- [x] 8.3 Create `server/src/controllers/EmailCtrl.js` (`verify`, `send`, `sendRegistration`)
+- [x] 8.4 Send the registration email from `UserCtrl.register()` in the background
+- [x] 8.5 Verify the SMTP login, and that registration succeeds and logs the error when the email can't be sent
+- [ ] 8.6 Set `EMAIL_FROM` to an SES-verified sender and confirm a real registration email arrives
