@@ -16,17 +16,32 @@ export class GraphqlError extends Error {
 
 export default class GraphqlCtrl {
   /**
+   * Escapes free text (names, emails…) for use inside a quoted GraphQL
+   * string: "${GraphqlCtrl.escape(firstName)}". Not needed for values that
+   * can't contain quotes or backslashes, such as UUIDs or tokens.
+   */
+  static escape(value) {
+    return String(value ?? '')
+      .replaceAll('\\', '\\\\')
+      .replaceAll('"', '\\"')
+      .replaceAll('\n', '\\n')
+      .replaceAll('\r', '\\r')
+      .replaceAll('\t', '\\t');
+  }
+
+  /**
    * Sends a query or mutation to the server.
+   * @param {string} query the full GraphQL document, values included
    * @returns {Promise<object>} the `data` of the response
    * @throws {GraphqlError} the first GraphQL error, or a network error
    */
-  static async request(query, variables = {}) {
+  static async request(query) {
     let body;
     try {
       const response = await fetch(ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query, variables }),
+        body: JSON.stringify({ query }),
       });
       body = await response.json();
     } catch {

@@ -5,22 +5,22 @@ enum UserStatus {
 }
 
 type User {
-  uuid: ID!
+  uuid: UUID!
   firstName: String!
   lastName: String!
-  email: String!
+  email: EmailAddress!
   status: UserStatus!
 }
 
 input RegisterUserInput {
-  uuid: ID!
+  uuid: UUID!
   firstName: String!
   lastName: String!
-  email: String!
+  email: EmailAddress!
 }
 
 extend type Mutation {
   registerUser(input: RegisterUserInput!): User!
   verifyEmail(token: String!): User!
-  resendVerificationEmail(email: String!): Boolean!
+  resendVerificationEmail(email: EmailAddress!): Boolean!
 }

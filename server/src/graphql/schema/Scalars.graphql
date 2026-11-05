@@ -1,0 +1,6 @@
+# Scalars from graphql-scalars (https://the-guild.dev/graphql/scalars).
+# Declaring one here (or in any schema file) makes the loader use the
+# library's implementation, which validates the value.
+scalar UUID
+scalar EmailAddress
+scalar JSON

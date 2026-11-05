@@ -1,7 +1,8 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { buildSchema, graphql } from 'graphql';
+import { GraphQLSchema, Kind, extendSchema, graphql, parse } from 'graphql';
+import { resolvers as scalarResolvers } from 'graphql-scalars';
 
 const SCHEMA_DIR = path.join(import.meta.dirname, 'schema');
 const RESOLVER_DIR = path.join(import.meta.dirname, 'resolver');
@@ -24,13 +25,39 @@ async function listFiles(dir, suffix) {
     .sort(byName);
 }
 
+// `scalar X` declarations whose name is a graphql-scalars type (UUID,
+// EmailAddress, DateTime…). Those use the library's implementation, which
+// validates and converts values; any other scalar stays a plain pass-through.
+const isLibraryScalar = (definition) =>
+  definition.kind === Kind.SCALAR_TYPE_DEFINITION &&
+  Object.hasOwn(scalarResolvers, definition.name.value);
+
 // Joins schema/*.graphql after the base document and builds the schema.
 async function loadSchema() {
   const files = await listFiles(SCHEMA_DIR, '.graphql');
   const parts = await Promise.all(
     files.map((file) => fs.readFile(path.join(SCHEMA_DIR, file), 'utf8')),
   );
-  return buildSchema([BASE_SCHEMA, ...parts].join('\n'));
+  const document = parse([BASE_SCHEMA, ...parts].join('\n'));
+
+  // Start from a schema that already holds the graphql-scalars types used in
+  // the files, then add everything else on top of it.
+  const scalarNames = new Set(
+    document.definitions.filter(isLibraryScalar).map((d) => d.name.value),
+  );
+  const base = new GraphQLSchema({
+    types: [...scalarNames].map((name) => scalarResolvers[name]),
+  });
+  const extended = extendSchema(base, {
+    ...document,
+    definitions: document.definitions.filter((d) => !isLibraryScalar(d)),
+  });
+
+  return new GraphQLSchema({
+    ...extended.toConfig(),
+    query: extended.getType('Query'),
+    mutation: extended.getType('Mutation'),
+  });
 }
 
 // Merges the default export of every resolver/*Res.js into one root object.

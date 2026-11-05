@@ -47,3 +47,15 @@ See [spec.md](spec.md) and [plan.md](plan.md). Check each box when done.
 - [x] 8.4 Send the registration email from `UserCtrl.register()` in the background
 - [x] 8.5 Verify the SMTP login, and that registration succeeds and logs the error when the email can't be sent
 - [ ] 8.6 Set `EMAIL_FROM` to an SES-verified sender and confirm a real registration email arrives
+
+## 9. Single-argument GraphqlCtrl.request
+- [x] 9.1 `GraphqlCtrl.request(query)`: no `variables` argument; sends `{ query }`
+- [x] 9.2 `UserCtrl` (app): `register`, `verifyEmail`, `resendVerificationEmail` as inline queries with `"${value}"`; free text escaped with `GraphqlCtrl.escape()`
+- [x] 9.3 Verify in the browser, including a name with quotes
+
+## 10. graphql-scalars
+- [x] 10.1 Ask for permission, then add `graphql-scalars` (2.0.1) to the spec and install it in `server/`
+- [x] 10.2 Loader: library scalars as the base schema, files added with `extendSchema`, explicit `Query` / `Mutation` roots
+- [x] 10.3 `schema/Scalars.graphql` with `UUID` and `EmailAddress`
+- [x] 10.4 `User.graphql`: `uuid` → `UUID`, `email` → `EmailAddress` (type, input and resend argument)
+- [x] 10.5 Verify: valid register, bad UUID / email rejected, `EMAIL_TAKEN` still works, app register + resend; delete test users
