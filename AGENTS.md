@@ -21,12 +21,13 @@ Application to manage organizations, properties, tasks and users.
 
 ### Dependencies
 - Never install a dependency on your own. Suggest it (name, version, why it's needed, alternatives) and ask for permission first.
-- Only after permission: add it to the current `spec.md` under "Dependencies (allowed)", then install it.
+- Only after permission: if working from a spec, add it to the current `spec.md` under "Dependencies (allowed)"; then install it.
 - Prefer what Node, the browser or existing dependencies already provide (e.g. `fetch`, `crypto`).
 
 ### Specs
-- Work is driven by specs in `specs/<YYYYMMDDHHMMSS>-<name>/` (`spec.md`, `plan.md`, `tasks.md`). Create them with `/new-spec`; archive finished ones with `/archive-spec` (moves them to `specs/archived/`).
-- **Don't implement anything until the spec is accepted.** Write `spec.md`, `plan.md` and `tasks.md` first, present them, and wait for explicit approval of all three before changing any code, database or configuration. If something changes during implementation, update the three files and get approval again before continuing.
+- Only create a spec when the user runs `/new-spec`. Otherwise, just make the requested changes directly — no spec, plan or tasks files.
+- Specs live in `specs/<YYYYMMDDHHMMSS>-<name>/` (`spec.md`, `plan.md`, `tasks.md`). Archive finished ones with `/archive-spec` (moves them to `specs/archived/`).
+- **When working from a spec, don't implement anything until it is accepted.** Write `spec.md`, `plan.md` and `tasks.md` first, present them, and wait for explicit approval of all three before changing any code, database or configuration. If something changes during implementation, update the three files and get approval again before continuing.
 - Keep the spec, plan and tasks in sync with what is actually built; check off tasks when done.
 - Never edit archived specs.
 - When something is out of scope, recommend how to do it (and which dependency, if any) in the spec's "Out of scope — recommendations" table.
