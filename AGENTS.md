@@ -25,7 +25,9 @@ Application to manage organizations, properties, tasks and users.
 - Prefer what Node, the browser or existing dependencies already provide (e.g. `fetch`, `crypto`).
 
 ### Specs
-- Only create a spec when the user runs `/new-spec`. Otherwise, just make the requested changes directly — no spec, plan or tasks files.
+- Only create a spec when the user runs `/new-spec`.
+- If there is an open spec (a folder in `specs/` outside `specs/archived/`), work on it: add new requests to its `spec.md`, `plan.md` and `tasks.md` and follow the approval rule below.
+- If there is no open spec, just make the requested changes directly — no spec, plan or tasks files.
 - Specs live in `specs/<YYYYMMDDHHMMSS>-<name>/` (`spec.md`, `plan.md`, `tasks.md`). Archive finished ones with `/archive-spec` (moves them to `specs/archived/`).
 - **When working from a spec, don't implement anything until it is accepted.** Write `spec.md`, `plan.md` and `tasks.md` first, present them, and wait for explicit approval of all three before changing any code, database or configuration. If something changes during implementation, update the three files and get approval again before continuing.
 - Keep the spec, plan and tasks in sync with what is actually built; check off tasks when done.
